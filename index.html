@@ -96,22 +96,33 @@
 
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row justify-between items-center w-full">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">MY Tech Chatbot</h1>
-            <!-- Language Dropdown -->
-            <div class="relative inline-block text-left">
-                <select class="block appearance-none w-full bg-white border border-gray-300
-                                text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm
-                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                                transition-all duration-200 ease-in-out cursor-pointer">
-                    <option value="english">English</option>
-                    <option value="spanish">Spanish</option>
-                    <option value="french">French</option>
-                </select>
-                <!-- Dropdown arrow icon -->
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9l4.95 4.95z"/>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-0">MY Tech Chatbot</h1> <!-- Slightly reduced text size -->
+            <div class="flex items-center space-x-2"> <!-- Container for Accessibility and Language -->
+                <!-- Accessibility Button -->
+                <button id="accessibilityButton" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg shadow-sm
+                                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                                        transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center">
+                    <!-- Magnifying Glass SVG Icon -->
+                    <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                     </svg>
+                </button>
+                <!-- Language Dropdown -->
+                <div class="relative inline-block text-left">
+                    <select class="block appearance-none w-full bg-white border border-gray-300
+                                    text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm min-w-[120px]
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                    transition-all duration-200 ease-in-out cursor-pointer">
+                        <option value="english">English</option> <!-- Changed default option text -->
+                        <option value="spanish">Spanish</option>
+                        <option value="french">French</option>
+                    </select>
+                    <!-- Dropdown arrow icon -->
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9l4.95 4.95z"/>
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>
@@ -158,21 +169,23 @@
     </div>
 
     <script>
-        // Get the textarea element
+        // Get elements
         const chatInput = document.getElementById('chatInput');
-        // Get the start button element
         const startButton = document.getElementById('startButton');
-        // Get modal elements
+        const speakButton = document.getElementById('speakButton'); // Get the speak button
         const customAlertModal = document.getElementById('customAlertModal');
         const modalMessage = document.getElementById('modalMessage');
         const modalCloseButton = document.getElementById('modalCloseButton');
+        const accessibilityButton = document.getElementById('accessibilityButton');
 
+        // Font sizes to cycle through
+        const fontScaleFactors = [1.0, 1.15, 1.3]; // Normal, Large, Larger (relative to default 16px root font size)
+        // Set initial index to the largest size
+        let currentScaleIndex = fontScaleFactors.length - 1;
 
         // Function to resize the textarea
         function resizeTextarea() {
-            // Set height to 'auto' first to correctly calculate scrollHeight
             chatInput.style.height = 'auto';
-            // Set the height to its scrollHeight (content height)
             chatInput.style.height = chatInput.scrollHeight + 'px';
         }
 
@@ -187,23 +200,34 @@
             customAlertModal.classList.remove('show');
         }
 
+        // Function to update the base font size for the entire UI
+        function updateUISize() {
+            document.documentElement.style.fontSize = `${fontScaleFactors[currentScaleIndex] * 16}px`; // Apply to html element
+            resizeTextarea(); // Recalculate textarea height after font size change
+        }
+
         // Event listener for input changes (typing) on the textarea
         chatInput.addEventListener('input', resizeTextarea);
 
-        // Event listener for the "Start" button click
+        // Event listener for the "Start With Text" button click
         startButton.addEventListener('click', () => {
             const inputText = chatInput.value;
-            // Use the custom modal instead of alert()
-	    if (inputText == "") {
-            	showCustomAlert("You did not enter any text!");
-	    } else {
-            	showCustomAlert("You entered: " + inputText);
-	    }
+            if (inputText === "") {
+                showCustomAlert("You did not enter any text!");
+            } else {
+                showCustomAlert("You entered: " + inputText);
+            }
         });
 
-        // Event listener for the "Speak Your Question" button click
+        // Event listener for the "How To Speak Your Question" button click
         speakButton.addEventListener('click', () => {
             showCustomAlert("When speaking your question, make sure that your voice is loud and clear. To speak your question, please close this dialogue, then hold down the microphone button.");
+        });
+
+        // Event listener for the Accessibility button click
+        accessibilityButton.addEventListener('click', () => {
+            currentScaleIndex = (currentScaleIndex + 1) % fontScaleFactors.length;
+            updateUISize();
         });
 
         // Event listener to close the custom modal
@@ -214,9 +238,10 @@
             }
         });
 
-        // Call resize immediately in case of pre-filled content (not applicable here, but good practice)
+        // Initialize on window load
         window.addEventListener('load', () => {
-            resizeTextarea();
+            updateUISize(); // Set initial UI size (now defaults to largest)
+            resizeTextarea(); // Set initial textarea height
         });
     </script>
 </body>
