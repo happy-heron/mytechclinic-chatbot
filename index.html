@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MY Tech Chatbot</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Apply Inter font family */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light grey background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensure it takes full viewport height */
+            margin: 0;
+            padding: 20px; /* Add some padding around the content */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+        /* Custom scrollbar for textarea (optional, but can make it look cleaner) */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Custom modal styles (replacing alert) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+	.modal-button {
+            /* Ensure text is blue, and it behaves like a link */
+            background-color: transparent; /* Explicitly ensure no background */
+            color: #2563eb; /* Tailwind blue-600 */
+            font-weight: 600; /* semibold */
+            padding: 8px 20px; /* py-2 px-5 */
+            border-radius: 8px; /* rounded-lg */
+            margin-top: 20px; /* mt-5 */
+            border: none; /* Remove any default button borders */
+            cursor: pointer; /* Indicate it's clickable */
+            transition: all 0.3s ease-in-out;
+            box-shadow: none; /* Ensure no shadow */
+            text-decoration: none; /* Start without underline */
+        }
+        .modal-button:hover {
+            color: #1e40af; /* Tailwind blue-800 */
+            text-decoration: underline; /* Add underline on hover */
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-200">
+    <!-- Main Container for the Chatbot UI -->
+    <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 lg:p-10 w-full max-w-md mx-auto
+                flex flex-col items-center space-y-6 md:space-y-8 border border-gray-200">
+
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-center w-full">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">MY Tech Chatbot</h1>
+            <!-- Language Dropdown -->
+            <div class="relative inline-block text-left">
+                <select class="block appearance-none w-full bg-white border border-gray-300
+                                text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm
+                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                transition-all duration-200 ease-in-out cursor-pointer">
+                    <option value="english">English</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                </select>
+                <!-- Dropdown arrow icon -->
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9l4.95 4.95z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Message Input Area (formerly display area) -->
+        <textarea id="chatInput"
+                  class="w-full bg-blue-50 border border-blue-200 text-gray-700 p-4 md:p-6 rounded-lg
+                         shadow-inner text-lg md:text-xl leading-relaxed resize-none overflow-hidden
+                         focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent
+                         transition-all duration-300 ease-in-out min-h-[96px]"
+                  placeholder="Hi there! I'm here to help. Type your question here..."
+                  rows="3"></textarea>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col space-y-4 w-full">
+            <button id="startButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6
+                           rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out
+                           transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75">
+                Start With Text
+            </button>
+	    <!-- Horizontal line added here -->
+	    <div class="border-t-2 border-gray-400 w-full my-4"></div>
+           <!-- Microphone Icon -->
+           <div class="mt-6 flex justify-center w-full">
+               <svg class="w-16 h-16 text-gray-500 hover:text-blue-500 transition-colors duration-200 cursor-pointer"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                   <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 4c0-1.66-1.34-3-3-3S9 2.34 9 4v7c0 1.66 1.34 3 3 3zm5.2-3c0 3.2-2.9 5.8-6.2 5.8S5.8 14.2 5.8 11H4c0 3.93 3.06 7.18 7 7.74V21h2v-2.26c3.94-.56 7-3.81 7-7.74h-1.8z"/>
+               </svg>
+           </div>
+            <button id="speakButton" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6
+                           rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out
+                           transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75">
+                How To Speak Your Question
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Modal Structure -->
+    <div id="customAlertModal" class="modal-overlay">
+        <div class="modal-content">
+            <p id="modalMessage" class="text-lg text-gray-800"></p>
+            <button id="modalCloseButton" class="modal-button">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Get the textarea element
+        const chatInput = document.getElementById('chatInput');
+        // Get the start button element
+        const startButton = document.getElementById('startButton');
+        // Get modal elements
+        const customAlertModal = document.getElementById('customAlertModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+
+        // Function to resize the textarea
+        function resizeTextarea() {
+            // Set height to 'auto' first to correctly calculate scrollHeight
+            chatInput.style.height = 'auto';
+            // Set the height to its scrollHeight (content height)
+            chatInput.style.height = chatInput.scrollHeight + 'px';
+        }
+
+        // Function to show the custom modal
+        function showCustomAlert(message) {
+            modalMessage.textContent = message;
+            customAlertModal.classList.add('show');
+        }
+
+        // Function to hide the custom modal
+        function hideCustomAlert() {
+            customAlertModal.classList.remove('show');
+        }
+
+        // Event listener for input changes (typing) on the textarea
+        chatInput.addEventListener('input', resizeTextarea);
+
+        // Event listener for the "Start" button click
+        startButton.addEventListener('click', () => {
+            const inputText = chatInput.value;
+            // Use the custom modal instead of alert()
+	    if (inputText == "") {
+            	showCustomAlert("You did not enter any text!");
+	    } else {
+            	showCustomAlert("You entered: " + inputText);
+	    }
+        });
+
+        // Event listener for the "Speak Your Question" button click
+        speakButton.addEventListener('click', () => {
+            showCustomAlert("When speaking your question, make sure that your voice is loud and clear. To speak your question, please close this dialogue, then hold down the microphone button.");
+        });
+
+        // Event listener to close the custom modal
+        modalCloseButton.addEventListener('click', hideCustomAlert);
+        customAlertModal.addEventListener('click', (e) => {
+            if (e.target === customAlertModal) { // Close when clicking outside the content
+                hideCustomAlert();
+            }
+        });
+
+        // Call resize immediately in case of pre-filled content (not applicable here, but good practice)
+        window.addEventListener('load', () => {
+            resizeTextarea();
+        });
+    </script>
+</body>
+</html>
