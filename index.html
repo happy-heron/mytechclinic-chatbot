@@ -121,13 +121,13 @@
                 </button>
                 <!-- Language Dropdown -->
                 <div class="relative inline-block text-left">
-                    <select class="block appearance-none w-full bg-white border border-gray-300
+                    <select id="languageSelect" class="block appearance-none w-full bg-white border border-gray-300
                                     text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm min-w-[120px]
                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                     transition-all duration-200 ease-in-out cursor-pointer">
-                        <option value="english">English</option>
-                        <option value="spanish">Spanish</option>
-                        <option value="french">French</option>
+                        <option value="en-US">English</option>
+                        <option value="es-ES">Spanish</option>
+                        <option value="fr-FR">French</option>
                     </select>
                     <!-- Dropdown arrow icon -->
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -158,7 +158,6 @@
 	    <!-- Horizontal line added here -->
 	    <div class="border-t-2 border-gray-400 w-full my-4"></div>
            <!-- Microphone Icon -->
-           <!-- Removed transform hover:scale-110 here as scaling is now handled by mic-active class on SVG -->
            <div id="microphoneButton" class="mt-6 flex justify-center w-full cursor-pointer transition-colors duration-200">
                <svg class="w-16 h-16"
                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -182,106 +181,114 @@
     </div>
 
     <script>
-	// Variable for if the speak element should work
-        var speakButtonWorks = true;
-        // Get elements
+        let speakButtonWorks = true;
         const chatInput = document.getElementById('chatInput');
         const startButton = document.getElementById('startButton');
         const speakButton = document.getElementById('speakButton');
-        const microphoneButton = document.getElementById('microphoneButton'); // Get the microphone button container
-        const microphoneSVG = microphoneButton.querySelector('svg'); // Get the SVG element itself
+        const microphoneButton = document.getElementById('microphoneButton');
+        const microphoneSVG = microphoneButton.querySelector('svg');
         const customAlertModal = document.getElementById('customAlertModal');
         const modalMessage = document.getElementById('modalMessage');
         const modalCloseButton = document.getElementById('modalCloseButton');
         const accessibilityButton = document.getElementById('accessibilityButton');
+        const languageSelect = document.getElementById('languageSelect'); // Get language select element
 
-        // Font sizes to cycle through
-        const fontScaleFactors = [1.0, 1.15, 1.3, 1.45, 1.6]; // Normal, Large, Larger (relative to default 16px root font size)
-        // Set initial index to the largest size
+        const fontScaleFactors = [1.0, 1.15, 1.3, 1.45, 1.6];
         let currentScaleIndex = fontScaleFactors.length - 1;
 
-        // Speech Recognition API setup
         let recognition;
         let isRecognizing = false;
+        let finalTranscript = ''; // To accumulate continuous speech
 
-        // Check for Web Speech API compatibility
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
-            recognition.continuous = false; // Only get one result per recognition instance
-            recognition.interimResults = false; // Only return final results
-            recognition.lang = 'en-US'; // Set language
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            // Language will be set before starting recognition
+            recognition.lang = languageSelect.value; // Set initial language
 
-            // Event handler for when recognition starts
             recognition.onstart = () => {
                 isRecognizing = true;
-                microphoneSVG.classList.add('mic-active'); // Add active styling
-                console.log('Speech recognition started...');
+                microphoneSVG.classList.add('mic-active');
+                finalTranscript = ''; // Clear transcript on start
+                console.log('Speech recognition started with language:', recognition.lang);
             };
 
-            // Event handler for when a speech result is found
             recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                showCustomAlert("You said: " + transcript);
-                console.log('Speech result:', transcript);
+                let interimTranscript = '';
+                let newFinalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        newFinalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                finalTranscript += newFinalTranscript;
+                console.log('Interim:', interimTranscript, 'Final:', newFinalTranscript);
             };
 
-            // Event handler for recognition errors
             recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
                 if (event.error === 'not-allowed') {
                     showCustomAlert("Microphone access denied. Please allow microphone access in your browser settings.");
                 } else if (event.error === 'no-speech') {
-                    showCustomAlert("No speech detected. Please try again.");
+                    console.log("No speech detected for a while.");
                 } else {
                     showCustomAlert("Speech recognition error: " + event.error);
                 }
+                if (isRecognizing) {
+                    recognition.stop();
+                }
             };
 
-            // Event handler for when recognition ends
             recognition.onend = () => {
-                isRecognizing = false;
-                microphoneSVG.classList.remove('mic-active'); // Remove active styling
                 console.log('Speech recognition ended.');
+                isRecognizing = false;
+                microphoneSVG.classList.remove('mic-active');
+                if (finalTranscript) {
+                    showCustomAlert("You said: " + finalTranscript);
+                } else {
+                    if (speakButtonWorks) {
+                         showCustomAlert("No clear speech was captured.");
+                    }
+                }
+                finalTranscript = '';
             };
 
         } else {
             console.warn('Web Speech API is not supported in this browser.');
-            var speakButtonWorks = false; // Disable if not supported
+            speakButtonWorks = false;
             microphoneButton.style.cursor = 'not-allowed';
             microphoneSVG.style.opacity = '0.5';
         }
 
-
-        // Function to resize the textarea
         function resizeTextarea() {
             chatInput.style.height = 'auto';
             chatInput.style.height = chatInput.scrollHeight + 'px';
         }
 
-        // Function to show the custom modal
         function showCustomAlert(message) {
             modalMessage.textContent = message;
             customAlertModal.classList.add('show');
         }
 
-        // Function to hide the custom modal
         function hideCustomAlert() {
+            modalCloseButton.focus(); // Set focus to close button
             customAlertModal.classList.remove('show');
         }
 
-        // Function to update the base font size for the entire UI
         function updateUISize() {
-            document.documentElement.style.fontSize = `${fontScaleFactors[currentScaleIndex] * 16}px`; // Apply to html element
-            resizeTextarea(); // Recalculate textarea height after font size change
+            document.documentElement.style.fontSize = `${fontScaleFactors[currentScaleIndex] * 16}px`;
+            resizeTextarea();
         }
 
-        // Event listener for input changes (typing) on the textarea
         chatInput.addEventListener('input', resizeTextarea);
 
-        // Event listener for the "Start With Text" button click
         startButton.addEventListener('click', () => {
-            const inputText = chatInput.value.trim(); // .trim() removes leading/trailing whitespace
+            const inputText = chatInput.value.trim();
             if (inputText === "") {
                 showCustomAlert("You did not enter any text!");
             } else {
@@ -289,58 +296,70 @@
             }
         });
 
-        // Event listener for the "How To Speak Your Question" button click
         speakButton.addEventListener('click', () => {
-	    if (speakButtonWorks != false) {
-		showCustomAlert("To speak your question, hold down the microphone button. Release it when you are done speaking. Make sure your voice is loud and clear.");
+	    if (speakButtonWorks) {
+		showCustomAlert("To speak your question, click the microphone button once to start, and click it again to stop recording. Make sure your voice is loud and clear.");
 	    } else {
             	showCustomAlert("Your browser does not support Web Speech API. Please use a modern browser like Chrome or Edge for voice input.");
 	    }
         });
 
-        // Event listeners for the Microphone button (mousedown and mouseup)
-        microphoneButton.addEventListener('mousedown', () => {
-            if (recognition && !isRecognizing) {
+        // Event listener for the Microphone button (toggle functionality)
+        microphoneButton.addEventListener('click', () => {
+            if (!recognition) {
+                showCustomAlert("Your browser does not support Web Speech API. Please use a modern browser like Chrome or Edge for voice input.");
+                return;
+            }
+
+            if (isRecognizing) {
+                recognition.stop();
+            } else {
                 try {
+                    // Set the language before starting recognition
+                    recognition.lang = languageSelect.value;
                     recognition.start();
                 } catch (e) {
-                    // Catch error if recognition is already running
-                    console.warn("Recognition already started or in a bad state:", e);
+                    console.warn("Recognition start failed:", e);
+                    if (e.name === 'AbortError') {
+                        console.log('Recognition was already active or aborted prematurely.');
+                        recognition.stop();
+                    } else if (e.name === 'NotAllowedError') {
+                        showCustomAlert("Microphone access denied. Please allow microphone access in your browser settings.");
+                    } else {
+                         showCustomAlert("Could not start speech recognition. Please try again.");
+                    }
+                    isRecognizing = false;
+                    microphoneSVG.classList.remove('mic-active');
                 }
             }
         });
 
-        microphoneButton.addEventListener('mouseup', () => {
-            if (recognition && isRecognizing) {
+        // Event listener for language dropdown change
+        languageSelect.addEventListener('change', () => {
+            if (isRecognizing) {
+                // If recording is active, stop it so the new language can take effect on next start
                 recognition.stop();
+                showCustomAlert("Language changed. Recording stopped. Please click the microphone again to record in " + languageSelect.options[languageSelect.selectedIndex].text + ".");
             }
+            // recognition.lang will be updated before the next recognition.start()
+            // This is handled in the microphoneButton click listener now.
         });
 
-        microphoneButton.addEventListener('mouseleave', () => {
-            if (recognition && isRecognizing) {
-                recognition.stop();
-            }
-        });
-
-
-        // Event listener for the Accessibility button click
         accessibilityButton.addEventListener('click', () => {
             currentScaleIndex = (currentScaleIndex + 1) % fontScaleFactors.length;
             updateUISize();
         });
 
-        // Event listener to close the custom modal
         modalCloseButton.addEventListener('click', hideCustomAlert);
         customAlertModal.addEventListener('click', (e) => {
-            if (e.target === customAlertModal) { // Close when clicking outside the content
+            if (e.target === customAlertModal) {
                 hideCustomAlert();
             }
         });
 
-        // Initialize on window load
         window.addEventListener('load', () => {
-            updateUISize(); // Set initial UI size (now defaults to largest)
-            resizeTextarea(); // Set initial textarea height
+            updateUISize();
+            resizeTextarea();
         });
     </script>
 </body>
