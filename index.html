@@ -249,7 +249,9 @@ R"(<!DOCTYPE html>
                 isRecognizing = false;
                 microphoneSVG.classList.remove('mic-active');
                 if (finalTranscript) {
+		    // here the voice recognition is finished, send it to back-end
                     showCustomAlert("You said: " + finalTranscript);
+		    sendToBackend(finalTranscript);
                 } else {
                     if (speakButtonWorks) {
                          showCustomAlert("No clear speech was captured.");
@@ -284,6 +286,27 @@ R"(<!DOCTYPE html>
             document.documentElement.style.fontSize = `${fontScaleFactors[currentScaleIndex] * 16}px`;
             resizeTextarea();
         }
+	
+	// For sending data to the backend
+	function sendToBackend(text) {
+	    const url = 'https://localhost:8080/6a187bbedb71b1917f5ea38d7c960a9a/d07ff2070a2d91dbe30e044a9189525e';
+	    const data = {
+    	    	lang: languageSelect.value,
+    	    	msg: text
+	    };
+	    
+	    fetch(url, {
+    	    	method: 'POST',
+    	    	headers: {
+        	    	'Content-Type': 'application/json'
+    	    	},
+    	    	body: JSON.stringify(data)
+	    })
+	    .then(response => response.json()) // Parse the JSON response
+	    // data here should be in the UI in the near future, as it's what the model returned
+	    .then(data => console.log(data)) // Log the response data
+	    .catch(error => console.error('Error:', error)); // Log any errors
+	}
 
         chatInput.addEventListener('input', resizeTextarea);
 
@@ -292,7 +315,9 @@ R"(<!DOCTYPE html>
             if (inputText === "") {
                 showCustomAlert("You did not enter any text!");
             } else {
+		// here the text input is finished, send it to back-end
                 showCustomAlert("You entered: " + inputText);
+		sendToBackend(inputText);
             }
         });
 

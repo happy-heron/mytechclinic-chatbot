@@ -1,7 +1,14 @@
 # MY Tech Chatbot
 ---
 ## Technical Details
-- Powered by TailwindCSS and basic HTML
-- Will be able to feed user input into "Open"AI[^1] API (*ChatGPT*) or Anthropic API (*Claude*)
+- Front-end is powered by TailwindCSS and basic HTML
+- Front-end has the ability to feed user input into "Open"AI[^1] API (*ChatGPT*) or Anthropic API (*Claude*)
+- The back-end is powered by C++ for performance and uses the "asio" library
+## API
+### Client --> Server
+- Client sends a POST request with the user's input via Javascript to an endpoint[^2]
+### Client <-- Server
+- Client receives data with the model's output back from the endpoint
 
 [^1]: More like ***Closed***AI
+[^2]: Specifically `/6a187bbedb71b1917f5ea38d7c960a9a/d07ff2070a2d91dbe30e044a9189525e`
