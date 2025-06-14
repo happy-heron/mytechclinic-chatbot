@@ -7,6 +7,3 @@
 [submodule "json"]
 	path = json
 	url = https://github.com/nlohmann/json
-[submodule "curl"]
-	path = curl
-	url = https://github.com/curl/curl

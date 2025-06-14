@@ -3,9 +3,14 @@
 //
 
 #include "GPTApp.hpp"
-
+#include <liboai.h>
 
 int main() {
-    const std::unique_ptr<WebApp> app {new GPTApp(8080)};
-    WebApp::serve(app);
+    /*const std::unique_ptr<WebApp> app {new GPTApp(8080)};
+    WebApp::serve(app);*/
+
+    liboai::OpenAI ai;
+
+
+    return 0;
 }

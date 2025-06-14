@@ -4,7 +4,7 @@
 
 #ifndef WEBAPP_HPP
 #define WEBAPP_HPP
-#include "../include/crow_all.h"
+#include <crow_all.h>
 #include <cassert>
 #include <iostream>
 
