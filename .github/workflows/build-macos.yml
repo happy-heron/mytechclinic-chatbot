@@ -1,0 +1,25 @@
+name: Build (MacOS)
+on: workflow_dispatch
+
+jobs:
+  Build:
+    runs-on: macos-latest
+    steps:
+      - name: Get repository code
+        uses: actions/checkout@v4
+
+      - name: Install cmake and curl
+        run: | 
+          brew update
+          brew install --formula cmake curl
+
+      - name: Build with cmake
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -S mytechclinic-chatbot -B build
+          cmake -B build
+
+      - name: Upload atrifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "mytechclinic_chatbot"
+          path: "build/mytechclinic_chatbot"
