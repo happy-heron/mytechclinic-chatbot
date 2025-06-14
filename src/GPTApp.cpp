@@ -14,6 +14,7 @@ void GPTApp::init_routes() {
     // Big "genius" idea: security through obscurity
     CROW_ROUTE(app, "/6a187bbedb71b1917f5ea38d7c960a9a/d07ff2070a2d91dbe30e044a9189525e").methods("POST"_method)
     ([](const crow::request &r) {
+        // add checks later for safety
         const auto request_json = crow::json::load(r.body);
 
         std::cout << "Language: " << request_json["lang"] << " Message: " << request_json["msg"] << '\n';
