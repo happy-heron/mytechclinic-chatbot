@@ -15,11 +15,11 @@ jobs:
 
       - name: Build with cmake
         run: |
-          cmake -DCMAKE_BUILD_TYPE=Release -S $PWD -B build
+          cmake -DCMAKE_BUILD_TYPE=Release -S $PWD -B $GITHUB_WORKSPACE/build
           cmake -B build
 
       - name: Upload atrifact
         uses: actions/upload-artifact@v4
         with:
           name: "mytechclinic_chatbot"
-          path: "build/mytechclinic_chatbot"
+          path: "$GITHUB_WORKSPACE/build/mytechclinic_chatbot"
