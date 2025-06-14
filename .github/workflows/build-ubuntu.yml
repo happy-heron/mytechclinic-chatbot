@@ -1,0 +1,28 @@
+name: Build (Ubuntu)
+on: workflow_dispatch
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get repository code
+        uses: actions/checkout@v4
+
+      - name: Resolve submodules
+        run: git submodule update --init --recursive --depth=1
+
+      - name: Install cmake and curl
+        run: |
+          sudo apt update
+          sudo apt install cmake libcurl4-openssl-dev -y
+
+      - name: Build with cmake
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -S $PWD -B build
+          make --directory build
+
+      - name: Upload atrifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "mytechclinic_chatbot"
+          path: "build/mytechclinic_chatbot"
