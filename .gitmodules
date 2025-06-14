@@ -1,3 +1,12 @@
 [submodule "asio"]
 	path = asio
 	url = https://github.com/chriskohlhoff/asio
+[submodule "liboai"]
+	path = liboai
+	url = https://github.com/D7EAD/liboai
+[submodule "json"]
+	path = json
+	url = https://github.com/nlohmann/json
+[submodule "curl"]
+	path = curl
+	url = https://github.com/curl/curl
