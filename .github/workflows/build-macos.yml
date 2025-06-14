@@ -8,6 +8,9 @@ jobs:
       - name: Get repository code
         uses: actions/checkout@v4
 
+      - name: Resolve submodules
+        run: git submodule update --init --recursive --depth=1
+
       - name: Install cmake and curl
         run: | 
           brew update
