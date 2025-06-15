@@ -193,7 +193,7 @@ R"(<!DOCTYPE html>
         const accessibilityButton = document.getElementById('accessibilityButton');
         const languageSelect = document.getElementById('languageSelect'); // Get language select element
 
-        const fontScaleFactors = [1.0, 1.15, 1.3, 1.45, 1.6];
+        const fontScaleFactors = [1.0, 1.3, 1.6];
         let currentScaleIndex = fontScaleFactors.length - 1;
 
         let recognition;
@@ -250,7 +250,6 @@ R"(<!DOCTYPE html>
                 microphoneSVG.classList.remove('mic-active');
                 if (finalTranscript) {
 		    // here the voice recognition is finished, send it to back-end
-                    showCustomAlert("You said: " + finalTranscript);
 		    sendToBackend(finalTranscript);
                 } else {
                     if (speakButtonWorks) {
@@ -304,7 +303,7 @@ R"(<!DOCTYPE html>
 	    })
 	    .then(response => response.json()) // Parse the JSON response
 	    // data here should be in the UI in the near future, as it's what the model returned
-	    .then(data => console.log(data)) // Log the response data
+	    .then(data => showCustomAlert("Response: " + data.msg)) // Put the response data in the UI
 	    .catch(error => console.error('Error:', error)); // Log any errors
 	}
 
@@ -316,7 +315,6 @@ R"(<!DOCTYPE html>
                 showCustomAlert("You did not enter any text!");
             } else {
 		// here the text input is finished, send it to back-end
-                showCustomAlert("You entered: " + inputText);
 		sendToBackend(inputText);
             }
         });
