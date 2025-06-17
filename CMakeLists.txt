@@ -22,8 +22,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 add_executable(
         mytechclinic_chatbot
         src/main.cpp
-        src/WebApp.cpp
         src/GPTApp.cpp
+        src/AuthMiddleware.cpp
         liboai/liboai/core/authorization.cpp
         liboai/liboai/core/netimpl.cpp
         liboai/liboai/core/response.cpp

@@ -6,11 +6,18 @@
 #define GPTAPP_HPP
 
 #include "index_html.hpp"
-#include "WebApp.hpp"
+#include <crow_all.h>
+#include <cassert>
+#include "AuthMiddleware.hpp"
 
-struct GPTApp final : WebApp {
-    explicit GPTApp(const int port) : WebApp{port} {}
-    void init_routes() override;
+class GPTApp {
+
+    crow::App<AuthMiddleware> app;
+    void init_routes();
+
+    public:
+    explicit GPTApp(int /*port*/);
+    void serve();
 };
 
 

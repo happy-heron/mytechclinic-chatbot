@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>210</x>
+      <y>90</y>
+      <w>250</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>GPTApp
+--
+-app: crow::app&lt;AuthMiddleware&gt;
+--
++GPTApp(in port: int)
++serve(): void
+-init_routes(): void
+--
+Responsibilities
+-- Run webserver
+-- Make OpenAI api calls</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>730</x>
+      <y>90</y>
+      <w>290</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>AuthMiddleware : crow::ILocalMiddleware
+--
++before_handle(
+    in &amp;request: crow::request
+    in &amp;response: crow::response
+    in &amp;context: context
+): void
+
++after_handle(
+    in &amp;request: crow::request
+    in &amp;response: crow::response
+    in &amp;context: context
+): void
+--
+Responsibilities
+*-- Provides basic HTTP Authentication*
+-- crow middleware</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>450</x>
+      <y>180</y>
+      <w>300</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;..</panel_attributes>
+    <additional_attributes>280.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>770</x>
+      <y>450</y>
+      <w>210</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>namespace Credentials
+--
++user: const char *
++pass: const char *
+--
+Responsibilities
+-- Hold credentials</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>860</x>
+      <y>360</y>
+      <w>30</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;..</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
