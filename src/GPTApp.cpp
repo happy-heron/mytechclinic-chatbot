@@ -4,10 +4,22 @@
 
 #include "GPTApp.hpp"
 
-// `user_env` and `pass_env` will be nullptr if not declared
-GPTApp::GPTApp(const int port)  {
+// The reference to the file must be valid
+GPTApp::GPTApp(const int port, const optional_readonly_file_t file) {
+
     assert(port >= 1 && port <= 65535);
     app.port(port);
+
+    if (file && file->get().is_open()) {
+
+        // copy to string on heap
+        for (std::string line; std::getline(file->get(), line);) {
+            context += line + '\n';
+        }
+
+    } else {
+        std::cerr << "WARNING: CONTEXT FILE MISSING OR INACCESSIBLE" << std::endl;
+    }
 }
 
 

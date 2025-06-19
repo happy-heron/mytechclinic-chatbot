@@ -7,6 +7,7 @@
 int main() {
 
     // Pointers should hopefully be valid for the duration of the program
+    // Pointers will be null if variables not found
     Credentials::user = std::getenv("CHATBOT_USER");
     Credentials::pass = std::getenv("CHATBOT_PASS");
 
@@ -20,7 +21,10 @@ int main() {
         return 0;
     }
 
-    GPTApp app {8080};
+    // variable needed for move constructor
+    std::ifstream file {"context.md"};
+
+    GPTApp app {8080, optional_readonly_file_t {file}};
     app.serve();
 
     return 0;
