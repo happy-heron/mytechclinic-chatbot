@@ -17,6 +17,8 @@ GPTApp::GPTApp(const int port, const optional_readonly_file_t file) {
             context += line + '\n';
         }
 
+        file->get().close();
+
     } else {
         std::cerr << "WARNING: CONTEXT FILE MISSING OR INACCESSIBLE" << std::endl;
     }

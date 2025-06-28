@@ -21,7 +21,7 @@ int main() {
         return 0;
     }
 
-    // variable needed for move constructor
+    // variable needed for reference and opens file
     std::ifstream file {"context.md"};
 
     GPTApp app {8080, optional_readonly_file_t {file}};
