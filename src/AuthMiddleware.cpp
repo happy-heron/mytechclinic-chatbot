@@ -4,12 +4,21 @@
 
 #include "AuthMiddleware.hpp"
 
+/*
+ * Fails authentication for a request and edits the response to contain necessary information for client to retry
+ * authentication.
+ */
 void fail_auth(crow::response &response) {
     response.code = 401;
     response.add_header("WWW-Authenticate", "Basic");
     response.end();
 }
 
+/*
+ * Main method of the middleware. Inspects each request on an endpoint that the middleware is used and is intended to
+ * have basic HTTP authenitcation. Checks for the username and password defined in `namespace Credentials` which at
+ * this point are defined by environmental variables.
+ */
 void AuthMiddleware::before_handle(crow::request &request, crow::response &response, context &context) const {
 
     // check if header exists

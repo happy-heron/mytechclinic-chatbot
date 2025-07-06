@@ -10,13 +10,16 @@
 #include <cassert>
 #include "AuthMiddleware.hpp"
 #include <filesystem>
+#include <liboai.h>
 
 using optional_readonly_file_t = std::optional<std::reference_wrapper<std::ifstream>>;
 
 class GPTApp {
 
     crow::App<AuthMiddleware> app;
-    std::string context;
+    std::string context {};
+    liboai::OpenAI oai_api;
+    liboai::Conversation conv;
 
     void init_routes();
 
