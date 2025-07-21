@@ -299,6 +299,8 @@ R"(<!DOCTYPE html>
         function hideCustomAlert() {
             modalCloseButton.focus(); // Set focus to close button
             customAlertModal.classList.remove('show');
+	    // When hiding the custom alert, clear the chat input
+	    document.getElementById('chatInput').value = '';
         }
 
         function updateUISize() {
@@ -323,7 +325,7 @@ R"(<!DOCTYPE html>
 	    })
 	    .then(response => response.json()) // Parse the JSON response
 	    // data here should be in the UI in the near future, as it's what the model returned
-	    .then(data => showCustomAlert("Response: " + data.msg)) // Put the response data in the UI
+	    .then(data => showCustomAlert(data.msg)) // Put the response data in the UI
 	    .catch(error => console.error('Error:', error)); // Log any errors
 	}
 
