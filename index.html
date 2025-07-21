@@ -61,10 +61,14 @@ R"(<!DOCTYPE html>
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
-            max-width: 90%;
-            width: 400px;
+            /* Increased width and max-width for a larger dialog */
+            max-width: 95%; /* Allow it to take up more screen width */
+            width: 600px; /* Increased fixed width */
             transform: translateY(-20px);
             transition: transform 0.3s ease-in-out;
+            display: flex; /* Use flexbox for content alignment */
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; /* Center items horizontally */
         }
         .modal-overlay.show .modal-content {
             transform: translateY(0);
@@ -98,6 +102,22 @@ R"(<!DOCTYPE html>
         .mic-active {
             color: #3b82f6 !important; /* Blue color for active state (Tailwind blue-500) */
             transform: scale(1.1); /* Slightly enlarge when active */
+        }
+
+        /* Styling for the scrollable modal message */
+        #modalMessage {
+            max-height: 450px; /* Increased max height for scrollability */
+            overflow-y: auto; /* Enable vertical scrolling */
+            text-align: left; /* Align text to the left for better readability in long messages */
+            padding: 10px; /* Add padding inside the scrollable area */
+            border: 1px solid #e2e8f0; /* Light border for visual separation */
+            border-radius: 8px; /* Rounded corners */
+            background-color: #f8fafc; /* Slightly different background for the text area */
+            width: 100%; /* Ensure it takes full width of modal content */
+            box-sizing: border-box; /* Include padding and border in width */
+            font-size: 1.125em; /* Larger font size for readability (text-lg in Tailwind) */
+            line-height: 1.6; /* Improve line spacing */
+            color: #1a202c; /* Darker text color */
         }
     </style>
 </head>
