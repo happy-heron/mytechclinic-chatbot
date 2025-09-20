@@ -4,6 +4,8 @@
 
 #include "GPTApp.hpp"
 
+using namespace std::string_literals;
+
 /*
  * Creates a GPT App. Port must be in [1, 65535]. Context file is optional
  */
@@ -77,17 +79,18 @@ void GPTApp::init_routes() {
             std::cerr << "FAILED TO UPDATE CONVERSATION\n";
         }
 
-        const liboai::Response chat_resp = oai_api.ChatCompletion->create("gpt-3.5-turbo", conv);
+        const liboai::Response chat_resp { oai_api.ChatCompletion->create("gpt-3.5-turbo", conv) };
 
         if (!conv.Update(chat_resp)) {
             std::cerr << "FAILED TO UPDATE CONVERSATION AFTER RESPONSE\n";
+        } else {
+            // Echo
+            response_json["lang"] = request_json["lang"];
+            response_json["msg"] = conv.GetLastResponse();
+
+            return response_json.dump();
         }
-
-        // Echo
-        response_json["lang"] = request_json["lang"];
-        response_json["msg"] = conv.GetLastResponse();
-
-        return response_json.dump();
+        return R"({"lang": "null", "msg": "null"})"s;
     });
 }
 
