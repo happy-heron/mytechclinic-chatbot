@@ -25,7 +25,7 @@ int main() {
     // variable needed for reference and opens file
     std::ifstream file {"context.md"};
 
-    GPTApp app {443, optional_readonly_file_t {file}};
+    GPTApp app {80, optional_readonly_file_t {file}};
     app.serve();
 
     return 0;
